@@ -1,4 +1,4 @@
-#include "kinematics.h"
+#include "./kinematics.h"
 
 class kinematics{
   public:
