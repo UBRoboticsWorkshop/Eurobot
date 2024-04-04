@@ -3,7 +3,7 @@ import pigpio
 
 
 
-class servo:
+class pwmservo:
     def __init__(self, pin=12, upper_limit=1900, lower_limit=1100, angle_limit=180):
         self._lower_limit = lower_limit
         self._x = float(upper_limit - lower_limit) / float(angle_limit)
