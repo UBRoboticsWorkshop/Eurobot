@@ -28,14 +28,19 @@ class kinematics:
                 Position_.Lefty = true
             if (-180 <= Position_.RightlyJoint0 <= 180 && 0 <= Position_.RightlyJoint1 <= 180 && 0 <= Position_.RightlyJoint2 <= 180):
                 Position_.Rightly = true
+        return Joint0, Joint1, Joint2, Joint3, Joint4
 
-    def ForwardKinematics(self, Joint0, Joint1, Joint2):
-        ForwardKinematics_.Z = _L1 * sin(Joint1) + _L2 * sin(Joint1 + Joint2)
+    def ForwardKinematics(self, Joint0, Joint1, Joint2, Joint3, Joint4):
+        Z = _L1 * sin(Joint1) + _L2 * sin(Joint1 + Joint2)
         _xy = _L1 * cos(Joint1) + _L2 * cos(Joint1 + Joint2)
-        ForwardKinematics_.X = _xy * cos(Joint0)
-        ForwardKinematics_.Y = _xy * sin(Joint0)
+        X = _xy * cos(Joint0)
+        Y = _xy * sin(Joint0)
+
+        return X, Y, Z
 
     def CoordinateTrans(self, originX, originY, originZ, X, Y, Z):
-        transformed_.X = X - originX
-        transformed_.Y = Y - originY
-        transformed_.Z = Z - originZ
+        X = X - originX
+        Y = Y - originY
+        Z = Z - originZ
+
+        return X, Y, Z
