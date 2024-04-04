@@ -1,14 +1,12 @@
-from '../PWMServo/pwmservo' import pwmservo
-
 class kinematics:
-    def __init__(L1, L2):
-        _L1 = L1
-        _L2 = L2
+    def __init__(self, L1, L2):
+        self._L1 = L1
+        self._L2 = L2
 
-        _Lsum = _L1 + _L2
-        _Ldiff = abs(_L1 - _L2)
+        self._Lsum = L1 + L2
+        self._Ldiff = abs(L1 - L2)
 
-    def InverseKinematics(float targetX, float targetY, float targetZ):
+    def InverseKinematics(self, targetX, targetY, targetZ):
 
         x_y = sqrt(targetX * targetX + targetY * targetY)
         xy_z = sqrt(x_y * x_y + targetZ * targetZ)
@@ -28,16 +26,16 @@ class kinematics:
 
             if (-180 <= Position_.LeftyJoint0 <= 180 && 0 <= Position_.LeftyJoint1 <= 180 && 0 <= Position_.LeftyJoint2 <= 180):
                 Position_.Lefty = true
-            if (-180 <= Position_.RightlyJoint0 <= 180 && 0 <= Position_.RightlyJoint1 <= 180 && 0 <= Position_.RightlyJoint2 <= 180)
+            if (-180 <= Position_.RightlyJoint0 <= 180 && 0 <= Position_.RightlyJoint1 <= 180 && 0 <= Position_.RightlyJoint2 <= 180):
                 Position_.Rightly = true
 
-    def ForwardKinematics(float Joint0, float Joint1, float Joint2):
-      ForwardKinematics_.Z = _L1 * sin(Joint1) + _L2 * sin(Joint1 + Joint2)
-      _xy = _L1 * cos(Joint1) + _L2 * cos(Joint1 + Joint2)
-      ForwardKinematics_.X = _xy * cos(Joint0)
-      ForwardKinematics_.Y = _xy * sin(Joint0)
+    def ForwardKinematics(self, Joint0, Joint1, Joint2):
+        ForwardKinematics_.Z = _L1 * sin(Joint1) + _L2 * sin(Joint1 + Joint2)
+        _xy = _L1 * cos(Joint1) + _L2 * cos(Joint1 + Joint2)
+        ForwardKinematics_.X = _xy * cos(Joint0)
+        ForwardKinematics_.Y = _xy * sin(Joint0)
 
-    def CoordinateTrans(float originX, float originY, float originZ, float X, float Y, float Z):
-      transformed_.X = X - originX
-      transformed_.Y = Y - originY
-      transformed_.Z = Z - originZ
+    def CoordinateTrans(self, originX, originY, originZ, X, Y, Z):
+        transformed_.X = X - originX
+        transformed_.Y = Y - originY
+        transformed_.Z = Z - originZ
