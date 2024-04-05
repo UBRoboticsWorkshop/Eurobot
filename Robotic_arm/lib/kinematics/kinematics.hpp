@@ -1,32 +1,32 @@
-#include <Arduino.h>
-
 class kinematics{
   public:
-    kinematics(float L1, float L2){
+    kinematics(float L0, float L1, float L2, float L3, float L4, float L5){
+      _L0 = L0;
       _L1 = L1;
       _L2 = L2;
+      _L3 = L3;
+      _L4 = L4;
+      _L5 = L5;
     };
 
     struct Position {
-      //float Joint0, Joint1, Joint2, Joint3;
-      float RightlyJoint0, RightlyJoint1, RightlyJoint2, RightlyJoint3;
-      float LeftyJoint0, LeftyJoint1, LeftyJoint2, LeftyJoint3;
-      bool Lefty, Rightly;
+      float Joint0;
+      float RightlyJoint1, RightlyJoint2, RightlyJoint3;
+      float LeftyJoint1, LeftyJoint2, LeftyJoint3;
     } Position_;
 
     struct ForwardKinematicsOutput {
       float X, Y, Z;
     } ForwardKinematics_, transformed_;
 
-    void InverseKinematics(float targetX, float targetY, float targetZ)
-    void ForwardKinematics(float Joint0, float Joint1, float Joint2)
-    void CoordinateTrans(float originX, float originY, float originZ, float X, float Y, float Z)
+    void InverseKinematics(float targetX, float targetY, float targetZ, float endeffectorAngle);
+    void ForwardKinematics(float Joint0, float Joint1, float Joint2);
+    void CoordinateTrans(float originX, float originY, float originZ, float X, float Y, float Z);
 
   private:
-    float _L1, _L2;
-    float _Lsum = _L1 + _L2;
-    float _Ldiff = abs(_L1 - _L2);
+    float _L0, _L1, _L2, _L3, _L4, _L5;
+    float _Lsum = _L0 + _L1;
+    float _Ldiff = abs(_L0 - _L1);
     float _Alpha, _Beta, _Gamma;
-    float _xy;
     //float _Theta;
 };
