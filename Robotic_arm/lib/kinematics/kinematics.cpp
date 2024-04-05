@@ -32,7 +32,7 @@ void kinematics::InverseKinematics(float targetX, float targetY, float targetZ, 
       Position_.LeftyJoint3 = -180.0f + endeffectorAngle - Position_.LeftyJoint1 - Position_.LeftyJoint2 + 360.0f;
     }
   } else {
-    ESP_LOGW(TAG, "OUT OFF RANGE!");
+    ESP_LOGW(TAG, "OUT OF RANGE!");
   }
 };
 
