@@ -1,33 +1,57 @@
+from math import acos, atan2, sin, cos, sin
+import math.pi as PI
+
+
+
 class kinematics:
-    def __init__(self, L1, L2):
+    def __init__(self, L0, L1, L2, L3, L4):
+        self._L0 = L0
         self._L1 = L1
         self._L2 = L2
+        self._L3 = L3
+        self._L4 = L4
 
-        self._Lsum = L1 + L2
-        self._Ldiff = abs(L1 - L2)
+        self._Lsum = L0 + L1
+        self._Ldiff = abs(L0 - L1)
 
-    def InverseKinematics(self, targetX, targetY, targetZ):
+    # end effector angle in XY_Z 2D pannel > 0
+    def InverseKinematics(self, targetX, targetY, targetZ, endeffectorAngle, Joint4, Lefty = true):
+        Joint0, Joint1, Joint2, Joint3, Joint4 = 0.0, 0.0, 0.0, 0.0, Joint4
 
-        x_y = sqrt(targetX * targetX + targetY * targetY)
-        xy_z = sqrt(x_y * x_y + targetZ * targetZ)
+        # fix end effector direction : unit vector x (L3 + L4)
+        targetZJ3 = targetZ + sin(180.0 - endeffectorAngle) * (self._L3 + self._L4)
+        x_y = (targetX**2 + targetY**2) ** 2 - cos(180.0 - endeffectorAngle) * (self._L3 + self._L4)# Length in xy plannel
+        xy_z = (x_y**2 + targetZJ3**2) ** 2 # Length in xy_z plannel
 
-        Position_.Lefty = false
-        Position_.Rightly = false
+        if ((xy_z <= _Lsum) and (xy_z >= _Ldiff)):
+            _Alpha = acos((xy_z**2 + self._L0**2 - self._L1**2) / (2 * self._L0 * xy_z)) * 180.0 / PI
+            _Beta = acos((self._L0**2 + self._L1**2 - xy_z**2) / (2 * self._L0 * self._L1)) * 180.0 / PI
+            _Gamma = atan2(targetZJ3, x_y) * 180.0 / PI
 
-        if (xy_z <= _Lsum && xy_z >= _Ldiff):
-            _Alpha = acos((xy_z * xy_z + _L1 * _L1 - _L2 * _L2) / (2 * _L1 * xy_z)) * 180.0 / PI
-            _Beta = acos((_L1 * _L1 + _L2 * _L2 - xy_z * xy_z) / (2 * _L1 * _L2)) * 180.0 / PI
-            _Gamma = atan2(targetZ, x_y) * 180.0 / PI
-            Position_.LeftyJoint0 = Position_.RightlyJoint0 = atan2(targetY, targetX) * 180.0 / PI
-            Position_.RightlyJoint1 = _Gamma - _Alpha
-            Position_.RightlyJoint2 = 180.0 - _Beta
-            Position_.LeftyJoint1 = _Gamma + _Alpha
-            Position_.LeftyJoint2 = _Beta - 180.0
+            Joint0 = atan2(targetY, targetX) * 180.0 / PI # Joint or end effector does not matter
 
-            if (-180 <= Position_.LeftyJoint0 <= 180 && 0 <= Position_.LeftyJoint1 <= 180 && 0 <= Position_.LeftyJoint2 <= 180):
-                Position_.Lefty = true
-            if (-180 <= Position_.RightlyJoint0 <= 180 && 0 <= Position_.RightlyJoint1 <= 180 && 0 <= Position_.RightlyJoint2 <= 180):
-                Position_.Rightly = true
+            RightlyJoint1 = _Gamma - _Alpha
+            RightlyJoint2 = 180.0 - _Beta
+
+            LeftyJoint1 = _Gamma + _Alpha
+            LeftyJoint2 = _Beta - 180.0
+
+            if (Lefty):
+                Joint1 = LeftyJoint1
+                Joint2 = LeftyJoint2
+            else:
+                Joint1 = RightlyJoint1
+                Joint2 = RightlyJoint2
+
+        else:
+            print("OUT OFF RANGE!")
+            #Joint0, Joint1, Joint2, Joint3, Joint4 = InverseKinematics(targetX, targetY, targetZ, endeffectorAngle, Joint4, Lefty) # TODO: change the end effectors angle
+
+        if (endeffectorAngle < 180.0):
+            Joint3 = 180.0 + endeffectorAngle - Joint1 - Joint2 + 360.0
+        else:
+            Joint3 = -180.0 + endeffectorAngle - Joint1 - Joint2 + 360.0
+
         return Joint0, Joint1, Joint2, Joint3, Joint4
 
     def ForwardKinematics(self, Joint0, Joint1, Joint2, Joint3, Joint4):
