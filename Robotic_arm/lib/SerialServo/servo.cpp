@@ -82,7 +82,9 @@ bool serialservo::moveTo(uint8_t ID, float position){
 }
 
 void serialservo::enabletorque(uint8_t ID){
-  write8bit(ID, SMS_STS_TORQUE_ENABLE, 1);
+  //write8bit(ID, SMS_STS_TORQUE_ENABLE, 1);
+  uint8_t posArray[2];
+  readTest(ID, SMS_STS_TORQUE_ENABLE, posArray, 1);
 }
 
 void serialservo::writeBuf(uint8_t ID, uint8_t MemAddr, uint8_t *nDat, uint8_t nLen, uint8_t Fun) {

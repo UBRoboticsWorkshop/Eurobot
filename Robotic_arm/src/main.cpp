@@ -19,10 +19,10 @@ kinematics Kinematics(20, 20, 20, 20, 20, 20);
 
 
 void setup(){
-    SerialServo.enabletorque(2);
-    SerialServo.SetID(2,0);
+  SerialServo.enabletorque(1);
 
-    PWMServo1.servoSetAngle(130);
+  SerialServo.moveTo(1, 90);
+  PWMServo1.servoSetAngle(90);
 }
 
 void loop(){
