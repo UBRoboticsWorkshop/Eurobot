@@ -1,3 +1,6 @@
+#ifndef pwmservo_hpp
+#define pwmservo_hpp
+
 class pwmservo {
 public:
     pwmservo(uint8_t pinIN, uint8_t ledCH, uint16_t lowerPWM = 10, uint16_t upperPWM = 65535, uint16_t lowerAngle = 0, uint16_t upperAngle = 180, float offset = 90) {
@@ -28,3 +31,5 @@ private:
     uint16_t _lowerAngle, _upperAngle;
     float _offset;
 };
+
+#endif

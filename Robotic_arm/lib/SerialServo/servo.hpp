@@ -1,3 +1,6 @@
+#ifndef serialservo_hpp
+#define serialservo_hpp
+
 class serialservo{
 public:
     serialservo(HardwareSerial &serialport): _serial(serialport){ //Serial2
@@ -17,3 +20,5 @@ private:
     void write8bit(uint8_t ID, uint8_t reg, uint8_t val);
     void readTest(uint8_t ID, uint8_t reg, uint8_t *data, uint8_t nLen);
 };
+
+#endif

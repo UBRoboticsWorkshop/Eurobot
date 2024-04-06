@@ -1,3 +1,6 @@
+#ifndef kinematics_hpp
+#define kinematics_hpp
+
 class kinematics{
   public:
     kinematics(float L0, float L1, float L2, float L3, float L4, float L5){
@@ -30,3 +33,5 @@ class kinematics{
     float _Alpha, _Beta, _Gamma;
     //float _Theta;
 };
+
+#endif
