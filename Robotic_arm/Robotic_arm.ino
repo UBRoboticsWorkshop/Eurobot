@@ -8,7 +8,7 @@ serialservo SerialServo_(Serial2);
 pwmservo PWMServo0(15,0);
 // Joint 4
 pwmservo PWMServo1(16,1);
-// Griper 
+// Gripper 
 pwmservo PWMServo2(17,2);
 pwmservo PWMServo3(18,3);
 
@@ -18,7 +18,7 @@ kinematics Kinematics(20, 20, 20, 20, 20, 20);
 
 
 void setup(){
-    
+
 }
 
 void loop(){
