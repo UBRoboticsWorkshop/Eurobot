@@ -1,6 +1,8 @@
 #ifndef serialservo_hpp
 #define serialservo_hpp
 
+#include <stdlib.h>
+
 class serialservo{
 public:
     serialservo(HardwareSerial &serialport): _serial(serialport){ //Serial2
@@ -9,7 +11,7 @@ public:
 
     void enabletorque(uint8_t ID);
     bool moveTo(uint8_t ID, float position);
-    void setID(uint8_t originID, uint8_t targetID);
+    void SetID(uint8_t originID, uint8_t targetID);
 
 private:
     HardwareSerial &_serial;

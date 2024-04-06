@@ -1,4 +1,5 @@
-#include "servo.hpp"
+#include "./servo.hpp"
+#include <Arduino.h>
 
 #define INST_PING 0x01
 #define INST_READ 0x02
@@ -56,7 +57,7 @@
 /*
  * @brief Broadcast ID: 254 (0xFE)
 */
-void serialservo::setID(uint8_t originID, uint8_t targetID){
+void serialservo::SetID(uint8_t originID, uint8_t targetID){
   write8bit(originID, SMS_STS_LOCK, 0);
   write8bit(originID, SMS_STS_ID, targetID);
   write8bit(targetID, SMS_STS_LOCK, 1);
