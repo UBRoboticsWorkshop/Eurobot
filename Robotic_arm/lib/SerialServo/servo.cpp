@@ -56,7 +56,7 @@
 
 /*
  * @brief Broadcast ID: 254 (0xFE)
-*/
+ */
 void serialservo::SetID(uint8_t originID, uint8_t targetID){
   write8bit(originID, SMS_STS_LOCK, 0);
   write8bit(originID, SMS_STS_ID, targetID);

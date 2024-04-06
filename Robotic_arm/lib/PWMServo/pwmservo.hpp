@@ -1,5 +1,6 @@
 #ifndef pwmservo_hpp
 #define pwmservo_hpp
+#include <Arduino.h>
 
 class pwmservo {
 public:

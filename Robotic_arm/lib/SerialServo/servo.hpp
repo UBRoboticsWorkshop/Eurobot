@@ -1,6 +1,6 @@
 #ifndef serialservo_hpp
 #define serialservo_hpp
-
+#include <Arduino.h>
 #include <stdlib.h>
 
 class serialservo{

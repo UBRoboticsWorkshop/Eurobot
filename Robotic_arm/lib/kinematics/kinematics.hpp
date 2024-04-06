@@ -1,5 +1,6 @@
 #ifndef kinematics_hpp
 #define kinematics_hpp
+#include <Arduino.h>
 
 class kinematics{
   public:
