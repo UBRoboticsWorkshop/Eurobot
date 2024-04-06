@@ -1,251 +1,142 @@
-#include "servo.h"
-enum command {
-  INST_PING = 0x01,
-  INST_READ = 0x02,
-  INST_WRITE = 0x03,
-  INST_REG_WRITE = 0x04,
-  INST_ACTION = 0x05,
-  INST_RESET = 0x06,
-  INST_SYNC_WRITE = 0x83,
-  P_PRESENT_POSITION_L = 56,
-  P_PRESENT_POSITION_H = 57,
-  P_PRESENT_SPEED_L = 58,
-  P_PRESENT_SPEED_H = 59,
-  P_PRESENT_LOAD_L = 60,
-  P_PRESENT_LOAD_H = 61,
-  P_PRESENT_VOLTAGE = 62,
-  P_PRESENT_TEMPERATURE = 63,
-  P_REGISTERED_INSTRUCTION = 64,
-  P_MOVING = 66,
-  P_ID = 5,
+#include "servo.hpp"
 
-  P_VERSION_L = 3,
-  P_VERSION_H = 4,
+#define INST_PING 0x01
+#define INST_READ 0x02
+#define INST_WRITE 0x03
+#define INST_REG_WRITE 0x04
+#define INST_REG_ACTION 0x05
+#define INST_SYNC_READ 0x82
+#define INST_SYNC_WRITE 0x83
 
-  P_BAUD_RATE = 6,
-  P_RETURN_DELAY_TIME = 7,
-  P_RETURN_LEVEL = 8,
-  P_MIN_ANGLE_LIMIT_L = 9,
-  P_MIN_ANGLE_LIMIT_H = 10,
-  P_MAX_ANGLE_LIMIT_L = 11,
-  P_MAX_ANGLE_LIMIT_H = 12,
-  P_LIMIT_TEMPERATURE = 13,
-  P_MAX_LIMIT_VOLTAGE = 14,
-  P_MIN_LIMIT_VOLTAGE = 15,
-  P_MAX_TORQUE_L = 16,
-  P_MAX_TORQUE_H = 17,
-  P_ALARM_LED = 19,
-  P_ALARM_SHUTDOWN = 20,
-  P_COMPLIANCE_P = 21,
-  P_PUNCH_L = 24,
-  P_PUNCH_H = 25,
-  P_CW_DEAD = 26,
-  P_CCW_DEAD = 27,
+//memory table definition
+//-------EPROM(read only)--------
+#define SMS_STS_MODEL_L 3
+#define SMS_STS_MODEL_H 4
 
-  P_TORQUE_ENABLE = 40,
-  P_LED = 41,
-  P_GOAL_POSITION_L = 42,
-  P_GOAL_POSITION_H = 43,
-  P_GOAL_TIME_L = 44,
-  P_GOAL_TIME_H = 45,
-  P_GOAL_SPEED_L = 46,
-  P_GOAL_SPEED_H = 47,
-  P_LOCK = 48  //THIS IS THE EEPROM LOCK :D SET TO TO 0 TO OPEN
-};
-/**
- * @brief ServoDriver class, drive the digital servo
- * 
- * 
- * @param s2 serial port for communication with the servo
- * 
- */
-class ServoDriver {
-private:
-  HardwareSerial &serial2;
-  unsigned char CheckSum = 0;
-  unsigned char buffer[11];
-  unsigned char act[6] = { 0xff, 0xff, 0xfe, 0x02, 0x05, 0xfa };
+//-------EPROM(read & write)--------
+#define SMS_STS_ID 5
+#define SMS_STS_BAUD_RATE 6
+#define SMS_STS_MIN_ANGLE_LIMIT_L 9
+#define SMS_STS_MIN_ANGLE_LIMIT_H 10
+#define SMS_STS_MAX_ANGLE_LIMIT_L 11
+#define SMS_STS_MAX_ANGLE_LIMIT_H 12
+#define SMS_STS_CW_DEAD 26
+#define SMS_STS_CCW_DEAD 27
+#define SMS_STS_OFS_L 31
+#define SMS_STS_OFS_H 32
+#define SMS_STS_MODE 33
 
-  unsigned char tOn[9] = { 0xff, 0xff, 0x01, 0x05, 0x03, 0x18, 0x01, 0x01, 0xDC };
-  unsigned char data;
-  unsigned char writeReg(int addr, int reg, unsigned char regVal) {
-    buffer[0] = 0xff;  //header
-    buffer[1] = 0xff;
-    buffer[2] = addr;  //ID
-    buffer[3] = 0x04;  //Len
-    buffer[4] = 0x03;  //Write
-    buffer[5] = reg;   //register
-    buffer[6] = regVal;
+//-------SRAM(read & write)--------
+#define SMS_STS_TORQUE_ENABLE 40
+#define SMS_STS_ACC 41
+#define SMS_STS_GOAL_POSITION_L 42
+#define SMS_STS_GOAL_POSITION_H 43
+#define SMS_STS_GOAL_TIME_L 44
+#define SMS_STS_GOAL_TIME_H 45
+#define SMS_STS_GOAL_SPEED_L 46
+#define SMS_STS_GOAL_SPEED_H 47
+#define SMS_STS_TORQUE_LIMIT_L 48
+#define SMS_STS_TORQUE_LIMIT_H 49
+#define SMS_STS_LOCK 55
 
-    CheckSum = 0;
-
-    for (int i = 2; i < (7); i++) {
-      CheckSum += buffer[i];
-    }
-
-    //serial.println(CheckSum);
-    CheckSum = (~CheckSum);
+//-------SRAM(read only)--------
+#define SMS_STS_PRESENT_POSITION_L 56
+#define SMS_STS_PRESENT_POSITION_H 57
+#define SMS_STS_PRESENT_SPEED_L 58
+#define SMS_STS_PRESENT_SPEED_H 59
+#define SMS_STS_PRESENT_LOAD_L 60
+#define SMS_STS_PRESENT_LOAD_H 61
+#define SMS_STS_PRESENT_VOLTAGE 62
+#define SMS_STS_PRESENT_TEMPERATURE 63
+#define SMS_STS_MOVING 66
+#define SMS_STS_PRESENT_CURRENT_L 69
+#define SMS_STS_PRESENT_CURRENT_H 70
 
 
-    serial2.write(buffer, 7);
-    serial2.write(CheckSum);
-
-
-    int i = 0;
-    unsigned char output = -1;
-
-    delay(10);
-
-    while (serial2.available() > 0) {
-
-      data = serial2.read();
-      if (i == 4) {
-        output = data;
-      }
-      i++;
-    }
-
-    return output;
-  }
-  void writeHL(int ID, int lReg, uint16_t value) {
-    unsigned char lBit = value & 0x00FF;
-    unsigned char hBit = (value & 0xFF00) >> 8;
-    writeTwoReg(ID, lReg, hBit, lBit);
-  }
-  unsigned char writeTwoReg(int addr, int reg, unsigned char regVal1, unsigned char regVal2) {
-    buffer[0] = 0xff;  //header
-    buffer[1] = 0xff;
-    buffer[2] = addr;  //ID
-    buffer[3] = 0x05;  //Len
-    buffer[4] = 0x03;  //Write
-    buffer[5] = reg;   //register
-    buffer[6] = regVal1;
-    buffer[7] = regVal2;
-
-    CheckSum = 0;
-
-    for (int i = 2; i < (8); i++) {
-      CheckSum += buffer[i];
-    }
-    CheckSum = (~CheckSum);
-
-
-    serial2.write(buffer, 8);
-    serial2.write(CheckSum);
-
-    CheckSum = ~CheckSum;
-
-
-    int i = 0;
-    unsigned char output = -1;
-
-    delay(10);
-
-    while (serial2.available() > 0) {
-
-      data = serial2.read();
-      if (i == 4) {
-        output = data;
-      }
-      i++;
-    }
-
-    return output;
-  }
-  unsigned char readReg(int addr, int reg) {
-    buffer[0] = 0xff;
-    buffer[1] = 0xff;
-    buffer[2] = addr;
-    buffer[3] = 0x04;
-    buffer[4] = 0x02;
-    buffer[5] = reg;  //register
-    buffer[6] = 0x01;
-
-    CheckSum = 0;
-
-    for (int i = 2; i < (6); i++) {
-      CheckSum += buffer[i];
-    }
-    CheckSum = (~CheckSum) - 1;
-
-
-    serial2.write(buffer, 7);
-    serial2.write(CheckSum);
-
-
-    int i = 0;
-    unsigned char output = -1;
-
-    //delay(100);
-
-    while (serial2.available() > 0) {
-
-      data = serial2.read();
-
-      if (i == 5) {
-        output = data;
-      }
-      i++;
-    }
-
-    return output;
-  }
-public:
-  ServoDriver(HardwareSerial &s2) :serial2(s2){
-
-    serial2.begin(1000000);
-  }
-  //only use when it is necessary to set the ID for servo
-  void setID(int originID,int targetID){
-    writeReg(originID, P_LOCK, 0);
-
-    writeReg(originID, P_ID, targetID);
-
-    delay(100);
-
-    writeReg(targetID, P_LOCK, 1);
-  }
-  bool moveTo(int ID, double position) {
-    writeReg(ID, P_TORQUE_ENABLE, 1);
-    position = position / (2 * PI);  //Normalize to fractions of a circle
-    position = position * 1800;
-    if (position < 0 || position > 1000) {
-      return 0;
-      //Serial.println("Failed");
-    }
-    int goalPos = position;
-    //Serial.println(goalPos);
-    writeHL(ID, P_GOAL_POSITION_L, goalPos);
-    return 1;
-  }
-};
-ServoDriver driver1(Serial2);
-/**
- * @brief program test
- * 
- */
-
-
-void setup() {
-  
-
-  // put your setup code here, to run once:
-
-}
-double angleR;
-int angle;
-int direction = 1;
-void loop() {
- 
-  angleR = angle * PI / 180;
-  if (angle >= 180) {
-    direction = -1;
-  } else if (angle <= 0) {
-    direction = 1;
-  }
-  angle += direction;
-  driver1.moveTo(1,angleR);
-  // put your main code here, to run repeatedly:
-
+/*
+ * @brief Broadcast ID: 254 (0xFE)
+*/
+void serialservo::setID(uint8_t originID, uint8_t targetID){
+  write8bit(originID, SMS_STS_LOCK, 0);
+  write8bit(originID, SMS_STS_ID, targetID);
+  write8bit(targetID, SMS_STS_LOCK, 1);
 }
 
+/*
+ * @param position in deg  
+ */
+bool serialservo::moveTo(uint8_t ID, float position){
+  if(position < 0.0f) position += 360.0f;
+  if (position > 360.0f) position -= 360.0f;
+
+  position = position / (2.0f * PI) * 1800;
+
+  if (position < 0 || position > 1000) {
+    return 0;
+    ESP_LOGW("serial_servo", "OUT OF RANGE!");
+  }
+  ESP_LOGI("serial_servo", "Servo %d goto: %d", ID, uint16_t(position));
+  write16bit(ID, SMS_STS_GOAL_POSITION_L, position);
+  return 1;
+}
+
+void serialservo::enabletorque(uint8_t ID){
+  write8bit(ID, SMS_STS_TORQUE_ENABLE, 1);
+}
+
+void serialservo::writeBuf(uint8_t ID, uint8_t MemAddr, uint8_t *nDat, uint8_t nLen, uint8_t Fun) {
+  uint8_t msgLen = 2;
+  uint8_t bBuf[6];
+  uint8_t CheckSum = 0;
+  bBuf[0] = 0xff;
+  bBuf[1] = 0xff;
+  bBuf[2] = ID;
+  bBuf[4] = Fun;
+  if (nDat) {
+    msgLen += nLen + 1;
+    bBuf[3] = msgLen;
+    bBuf[5] = MemAddr;
+    _serial.write(bBuf, 6);
+
+  } else {
+    bBuf[3] = msgLen;
+    _serial.write(bBuf, 5);
+  }
+  CheckSum = ID + msgLen + Fun + MemAddr;
+  uint8_t i = 0;
+  if (nDat) {
+    for (int i = 0; i < nLen; i++) {
+      CheckSum += nDat[i];
+    }
+    _serial.write(nDat, nLen);
+  }
+  _serial.write(~CheckSum);
+}
+
+void serialservo::writeTest(uint8_t ID, uint8_t reg, uint8_t *data, uint8_t nLen){
+  writeBuf(ID, reg, data, nLen, INST_WRITE);
+}
+
+void serialservo::write16bit(uint8_t ID, uint8_t reg, uint16_t val){
+  uint8_t data[2];
+  data[1] = (uint8_t)((val&0xFF00)>>8);
+  data[0] = (uint8_t)(val&0x00FF);
+  ESP_LOGI("serial_servo", "Write 2-bytes: %X%X", data[0], data[1]);
+  writeBuf(ID, reg, data, 2, INST_WRITE);
+}
+
+void serialservo::write8bit(uint8_t ID, uint8_t reg, uint8_t val){
+  writeBuf(ID, reg, &val, 1, INST_WRITE);
+}
+
+void serialservo::readTest(uint8_t ID, uint8_t reg, uint8_t *data, uint8_t nLen) {
+  writeBuf(ID, reg, &nLen, 1, INST_READ); 
+  uint8_t byteRead, i;
+  while (_serial.available() > 0) {
+    byteRead = _serial.read();
+    ESP_LOGI("serial_servo", "%d Read data: %d", i, byteRead);
+    if (i == 5) data[0] = byteRead;
+    if (i == 6) data[1] = byteRead;
+    i++;
+  }
+}
