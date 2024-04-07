@@ -74,10 +74,10 @@ void serialservo::moveTo(uint8_t ID, float angle){
   write16bit(ID, SMS_STS_GOAL_POSITION_L, position);
 }
 
-void serialservo::enabletorque(uint8_t ID){
+void serialservo::enabletorque(uint8_t ID, bool enable){
   //write8bit(ID, SMS_STS_TORQUE_ENABLE, 1);
   uint8_t posArray[2];
-  readTest(ID, SMS_STS_TORQUE_ENABLE, posArray, 1);
+  readTest(ID, SMS_STS_TORQUE_ENABLE, posArray, enable);
 }
 
 void serialservo::writeBuf(uint8_t ID, uint8_t MemAddr, uint8_t *nDat, uint8_t nLen, uint8_t Fun) {

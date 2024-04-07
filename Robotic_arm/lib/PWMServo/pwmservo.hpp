@@ -23,7 +23,7 @@ public:
 
     void moveTo(float angle);
     void servoGoto(uint16_t angle);
-    void servoStop();
+    void stop();
 
 private:
     uint8_t _pinIN;

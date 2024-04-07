@@ -3,7 +3,7 @@
 
 
 
-void pwmservo::servoStop() {
+void pwmservo::stop() {
   ledcWrite(_ledCH, 0);
 }
 

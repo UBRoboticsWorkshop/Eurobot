@@ -9,7 +9,7 @@ public:
         _serial.begin(1000000);
     };
 
-    void enabletorque(uint8_t ID);
+    void enabletorque(uint8_t ID, bool enable);
     void moveTo(uint8_t ID, float position);
     void SetID(uint8_t originID, uint8_t targetID);
 
