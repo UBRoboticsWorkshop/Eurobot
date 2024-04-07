@@ -10,7 +10,7 @@ public:
     };
 
     void enabletorque(uint8_t ID);
-    bool moveTo(uint8_t ID, float position);
+    void moveTo(uint8_t ID, float position);
     void SetID(uint8_t originID, uint8_t targetID);
 
 private:

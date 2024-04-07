@@ -4,7 +4,7 @@
 
 class pwmservo {
 public:
-    pwmservo(uint8_t pinIN, uint8_t ledCH, float offset = 90, uint16_t lowerPWM = 10, uint16_t upperPWM = 65535, uint16_t lowerAngle = 0, uint16_t upperAngle = 180) {
+    pwmservo(uint8_t pinIN, uint8_t ledCH, float offset = 90, uint16_t lowerPWM = 900, uint16_t upperPWM = 8500, uint16_t lowerAngle = 0, uint16_t upperAngle = 180) {
         _pinIN = pinIN; 
         _ledCH = ledCH;         // 0 - 15 are availible by default
 

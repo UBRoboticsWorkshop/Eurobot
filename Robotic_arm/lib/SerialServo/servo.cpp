@@ -66,19 +66,12 @@ void serialservo::SetID(uint8_t originID, uint8_t targetID){
 /*
  * @param position in deg  
  */
-bool serialservo::moveTo(uint8_t ID, float position){
-  if(position < 0.0f) position += 360.0f;
-  if (position > 360.0f) position -= 360.0f;
-
-  position = position / (2.0f * PI) * 1800;
-
-  if (position < 0 || position > 1000) {
-    return 0;
-    ESP_LOGW("serial_servo", "OUT OF RANGE!");
-  }
-  ESP_LOGI("serial_servo", "Servo %d goto: %d", ID, uint16_t(position));
+void serialservo::moveTo(uint8_t ID, float angle){
+  while (angle < 0.0f) angle += 360;
+  if (angle > 360.0f) angle = int(angle) % 360;
+  uint16_t position = map(angle, 0, 360, 0, 4095);
+  ESP_LOGI("serial_servo", "Servo %d goto: %d deg, %d/4096", ID, angle, position);
   write16bit(ID, SMS_STS_GOAL_POSITION_L, position);
-  return 1;
 }
 
 void serialservo::enabletorque(uint8_t ID){
@@ -124,7 +117,7 @@ void serialservo::write16bit(uint8_t ID, uint8_t reg, uint16_t val){
   uint8_t data[2];
   data[1] = (uint8_t)((val&0xFF00)>>8);
   data[0] = (uint8_t)(val&0x00FF);
-  ESP_LOGI("serial_servo", "Write 2-bytes: %X%X", data[0], data[1]);
+  ESP_LOGD("serial_servo", "Write 2-bytes: %X%X", data[0], data[1]);
   writeBuf(ID, reg, data, 2, INST_WRITE);
 }
 
