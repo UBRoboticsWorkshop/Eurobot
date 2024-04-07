@@ -9,6 +9,7 @@ void pwmservo::servoStop() {
 
 void pwmservo::servoGoto(uint16_t angle){ // processed angle lower - upper
   uint16_t pwm = map(angle, _lowerAngle, _upperAngle, _lowerPWM, _upperPWM);
+  ESP_LOGI("pwmservo", "Goto: %d deg, %d pwm", angle, pwm);
   ledcWrite(_ledCH, pwm);
 }
 

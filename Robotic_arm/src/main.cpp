@@ -27,6 +27,9 @@ void setup(){
 
   PWMServo0.moveTo(0);
   PWMServo1.moveTo(0);
+
+  PWMServo2.moveTo(0);
+  PWMServo3.moveTo(0);
 }
 
 void loop(){
