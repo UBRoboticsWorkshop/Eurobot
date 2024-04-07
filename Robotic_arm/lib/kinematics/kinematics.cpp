@@ -4,7 +4,7 @@ static const char* TAG = "kinematics";
 
 
 
-void kinematics::InverseKinematics(float targetX, float targetY, float targetZ, float endeffectorAngle) {
+void kinematics::InverseKinematics(float targetX, float targetY, float targetZ, float endeffectorAngle, bool rightly) {
   //fix end effector direction
   float targetZJ3 = targetZ + sin(180.0f - endeffectorAngle) * (_L3 + _L4);
 
@@ -18,19 +18,20 @@ void kinematics::InverseKinematics(float targetX, float targetY, float targetZ, 
 
     Position_.Joint0 = atan2(targetY, targetX) * 180.0f / PI;
 
-    Position_.RightlyJoint1 = _Gamma - _Alpha;
-    Position_.LeftyJoint1 = _Gamma + _Alpha;
-
-    Position_.RightlyJoint2 = 180.0f - _Beta;
-    Position_.LeftyJoint2 = _Beta - 180.0f;
+    if(rightly){
+      Position_.Joint1 = _Gamma - _Alpha;
+      Position_.Joint2 = 180.0f - _Beta;
+    } else {
+      Position_.Joint1 = _Gamma + _Alpha;
+      Position_.Joint2 = _Beta - 180.0f;
+    }
 
     if (endeffectorAngle < 180.0f){
-      Position_.RightlyJoint3 = 180.0f + endeffectorAngle - Position_.RightlyJoint1 - Position_.RightlyJoint2 + 360.0f;
-      Position_.LeftyJoint3 = 180.0f + endeffectorAngle - Position_.LeftyJoint1 - Position_.LeftyJoint2 + 360.0f;
+      Position_.Joint3 = 180.0f + endeffectorAngle - Position_.Joint1 - Position_.Joint2 + 360.0f;
     } else {
-      Position_.RightlyJoint3 = -180.0f + endeffectorAngle - Position_.RightlyJoint1 - Position_.RightlyJoint2 + 360.0f;
-      Position_.LeftyJoint3 = -180.0f + endeffectorAngle - Position_.LeftyJoint1 - Position_.LeftyJoint2 + 360.0f;
+      Position_.Joint3 = -180.0f + endeffectorAngle - Position_.Joint1 - Position_.Joint2 + 360.0f;
     }
+
   } else {
     ESP_LOGW(TAG, "OUT OF RANGE!");
   }

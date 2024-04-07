@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "Robotic_arm",
+			"path": "Robotic_arm"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.tcc": "cpp",
+			"optional": "cpp",
+			"cmath": "cpp"
+		}
+	}
+}

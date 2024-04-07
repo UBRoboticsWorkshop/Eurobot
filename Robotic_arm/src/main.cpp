@@ -20,7 +20,6 @@ kinematics Kinematics(20, 20, 20, 20, 20, 20);
 
 struct position {
   float joint0, joint1, joint2, joint3, joint4, gripper0, gripper1;
-  float X, Y, Z, A, B, C;
 } Position;
 
 int shell_reader(char * data){
@@ -38,16 +37,16 @@ void shell_writer(char data){
 }
 
 int help(int argc, char** argv){
-  shell_println("=============================help=============================");
-  shell_println("== 0. Set Joints' Angle: Goto <J0> <J1> <J2> <J3> <J4> <J5> ==");
-  shell_println("== 1. Turn Certain Angle: Add <J0> <J1> <J2> <J3> <J4> <J5> ==");
-  shell_println("== 2. Inverse Kinematics (base): Inv_kin <x> <y> <z>        ==");
-  shell_println("== 3. Inverse Kinematics (top end): Inv_kin_top <x> <y> <z> ==");
-  shell_println("== 4. Forward Kinematics: For_kin                           ==");
-  shell_println("== 5. Current Joint Angle: Angle                            ==");
-  shell_println("== 6. EStop: ESTOP                                          ==");
-  shell_println("== 7. Reboot: Reboot                                        ==");
-  shell_println("==============================================================");
+  shell_println("================================help===============================");
+  shell_println("== 0. Set Joints' Angle: Goto <J0> <J1> <J2> <J3> <J4> <J5>      ==");
+  shell_println("== 1. Turn Certain Angle: Add <J0> <J1> <J2> <J3> <J4> <J5>      ==");
+  shell_println("== 2. Inverse Kinematics (base): Inv_kin <x> <y> <z> -r(rightly) ==");
+  shell_println("== 3. Inverse Kinematics (top): Inv_kin_top <x> <y> <z> -r       ==");
+  shell_println("== 4. Forward Kinematics: For_kin                                ==");
+  shell_println("== 5. Current Joint Angle: Angle                                 ==");
+  shell_println("== 6. EStop: ESTOP                                               ==");
+  shell_println("== 7. Reboot: Reboot                                             ==");
+  shell_println("===================================================================");
 
   return SHELL_RET_SUCCESS;
 }
@@ -85,10 +84,14 @@ int For_kin(int argc, char** argv){
 }
 
 int Inv_kin(int argc, char** argv){
+  bool r = false;
+
   if(argc < 4){
     shell_print_error(E_SHELL_ERR_ARGCOUNT,0);
     shell_println("");
     return SHELL_RET_FAILURE;
+  } else if ((argc == 5) && (!strcmp(argv[4], (const char *) "-r"))){
+    r = true;
   }
 
   float X = strtof(argv[0], 0);
@@ -98,14 +101,14 @@ int Inv_kin(int argc, char** argv){
   ESP_LOGI("Shell", "Position: X %f, Y %f, Z %f, Ang %f", X, Y, X, endeffectorAngle);
 
   // calculate
-  Kinematics.InverseKinematics(X, Y, Z, endeffectorAngle);
-  ESP_LOGI("Shell", "inv_kin: J0 %f, J1 %f, J2 %f, J3 %f, J4 %f", Kinematics.Position_.Joint0, Kinematics.Position_.LeftyJoint1, Kinematics.Position_.LeftyJoint2, Kinematics.Position_.LeftyJoint3, Kinematics.Position_.Joint0);
+  Kinematics.InverseKinematics(X, Y, Z, endeffectorAngle, r);
+  ESP_LOGI("Shell", "inv_kin: J0 %f, J1 %f, J2 %f, J3 %f, J4 %f", Kinematics.Position_.Joint0, Kinematics.Position_.Joint1, Kinematics.Position_.Joint2, Kinematics.Position_.Joint3, Kinematics.Position_.Joint0);
 
   SerialServo.moveTo(1, Kinematics.Position_.Joint0);
-  SerialServo.moveTo(2, Kinematics.Position_.LeftyJoint1);
-  SerialServo.moveTo(3, Kinematics.Position_.LeftyJoint2);
+  SerialServo.moveTo(2, Kinematics.Position_.Joint1);
+  SerialServo.moveTo(3, Kinematics.Position_.Joint2);
 
-  PWMServo0.moveTo(Kinematics.Position_.LeftyJoint3);
+  PWMServo0.moveTo(Kinematics.Position_.Joint3);
   PWMServo1.moveTo(Kinematics.Position_.Joint0);
 
   return SHELL_RET_SUCCESS;

@@ -14,16 +14,14 @@ class kinematics{
     };
 
     struct Position {
-      float Joint0;
-      float RightlyJoint1, RightlyJoint2, RightlyJoint3;
-      float LeftyJoint1, LeftyJoint2, LeftyJoint3;
+      float Joint0, Joint1, Joint2, Joint3;
     } Position_;
 
     struct ForwardKinematicsOutput {
       float X, Y, Z;
     } ForwardKinematics_, transformed_;
 
-    void InverseKinematics(float targetX, float targetY, float targetZ, float endeffectorAngle);
+    void InverseKinematics(float targetX, float targetY, float targetZ, float endeffectorAngle, bool rightly);
     void ForwardKinematics(float Joint0, float Joint1, float Joint2, float Joint3, float Joint4);
     void CoordinateTrans(float originX, float originY, float originZ, float X, float Y, float Z);
 
