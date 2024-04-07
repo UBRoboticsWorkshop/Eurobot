@@ -36,7 +36,7 @@ void kinematics::InverseKinematics(float targetX, float targetY, float targetZ, 
   }
 };
 
-void kinematics::ForwardKinematics(float Joint0, float Joint1, float Joint2) {
+void kinematics::ForwardKinematics(float Joint0, float Joint1, float Joint2, float Joint3, float Joint4) {
   ForwardKinematics_.Z = _L1 * sin(Joint1) + _L2 * sin(Joint1 + Joint2);
   float _xy = _L1 * cos(Joint1) + _L2 * cos(Joint1 + Joint2);
   ForwardKinematics_.X = _xy * cos(Joint0);

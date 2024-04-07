@@ -23,142 +23,6 @@ struct position {
   float X, Y, Z, A, B, C;
 } Position;
 
-
-
-void setup() {
-  Serial.begin(115200);
-
-  SerialServo.enabletorque(254, true); // for all
-  SerialServo.moveTo(1, 0);
-  SerialServo.moveTo(2, 0);
-  SerialServo.moveTo(3, 0);
-
-  PWMServo0.moveTo(0);
-  PWMServo1.moveTo(0);
-
-  PWMServo2.moveTo(0);
-  PWMServo3.moveTo(0);
-
-  // shell init
-  shell_init(shell_reader, shell_writer, "5-DOF ARM, type 'help' for more info.");
-  shell_register(ESTOP, "ESTOP");
-  shell_register(help, "help");
-  shell_register(reboot, "Reboot");
-  shell_register(angle, "Angle");
-}
-
-void loop(){
-  // shell task
-  shell_task();
-
-  switch (INSTRUCTION_BUFFER[0]) {
-
-    case 0x01:{// Idle
-      if (Serial.available()) {Serial.readBytes(INSTRUCTION_BUFFER, INSTRUCTION_SIZE);}
-      break;
-    }
-
-    case 0x02:{// Set Angle for each joint
-      delay(100); // wait
-      if (Serial.available() < (FLOAT_SIZE * 5)) {
-        Serial.println("A float contains 4 bytes * 4 Joints!");
-        break;
-      }
-
-      // Joint0
-      Serial.readBytes(&Target.joint0, FLOAT_SIZE);
-      //memcpy (&Target.joint0, FLOAT_BUFFER, 4);
-
-      // Joint1
-      Serial.readBytes(FLOAT_BUFFER, FLOAT_SIZE);
-      memcpy (&Target.joint1, FLOAT_BUFFER, 4);
-
-      // Joint2
-      Serial.readBytes(FLOAT_BUFFER, FLOAT_SIZE);
-      memcpy (&Target.joint2, FLOAT_BUFFER, 4);
-
-      // Joint3
-      Serial.readBytes(FLOAT_BUFFER, FLOAT_SIZE);
-      memcpy (&Target.joint3, FLOAT_BUFFER, 4);
-
-      Difference.joint0 = Target.joint0 - Position.joint0;
-      Difference.joint1 = Target.joint1 - Position.joint1;
-      Difference.joint2 = Target.joint2 - Position.joint2;
-      Difference.joint3 = Target.joint3 - Position.joint3;
-
-      INSTRUCTION_BUFFER[0] = 0x03;
-      break;
-    }
-
-    case 0x04:{// Inverse kinematics
-      if (Serial.available() < 12) { // 1-4: X, 5-8: Y, 9-12: Z, 13-16: DirectionX, 17-20: DirectionY, 21-24: DirectionZ
-        delay(100); // wait
-        Serial.println("A float contains 4 bytes * 3 Axis!");
-        break;
-      }
-
-      // X
-      Serial.readBytes(FLOAT_BUFFER, FLOAT_SIZE);
-      memcpy (&Target.X, FLOAT_BUFFER, 4);
-
-      // Y
-      Serial.readBytes(FLOAT_BUFFER, FLOAT_SIZE);
-      memcpy (&Target.Y, FLOAT_BUFFER, 4);
-
-      // Z
-      Serial.readBytes(FLOAT_BUFFER, FLOAT_SIZE);
-      memcpy (&Target.Z, FLOAT_BUFFER, 4);
-
-      /* todo??? rotation vector
-      // DirectionX, A
-      // DirectionY, B
-      // DirectionZ, C09
-      */
-
-      // calculate
-      Kinematics.InverseKinematics(Target.X, Target.Y, Target.Z);
-      
-      if (Kinematics.Position_.Lefty) { // todo: consider about the angle at the end point
-        Target.joint0 = Kinematics.Position_.LeftyJoint0;
-        Target.joint1 = Kinematics.Position_.LeftyJoint1;
-        Target.joint2 = Kinematics.Position_.LeftyJoint2;
-        Target.joint3 = Kinematics.Position_.LeftyJoint3;
-      } else if (Kinematics.Position_.Rightly) {
-        Target.joint0 = Kinematics.Position_.RightlyJoint0;
-        Target.joint1 = Kinematics.Position_.RightlyJoint1;
-        Target.joint2 = Kinematics.Position_.RightlyJoint2;
-        Target.joint3 = Kinematics.Position_.RightlyJoint3;
-      } else {
-        Serial.println("Unreachable");
-        INSTRUCTION_BUFFER[0] = 0x01;
-        break;
-      }
-
-      Difference.joint0 = Target.joint0 - Position.joint0;
-      Difference.joint1 = Target.joint1 - Position.joint1;
-      Difference.joint2 = Target.joint2 - Position.joint2;
-      Difference.joint3 = Target.joint3 - Position.joint3;
-
-      INSTRUCTION_BUFFER[0] = 0x03;
-      break;
-    }
-
-    case 0x06:{ // Forward kinematics
-      Kinematics.ForwardKinematics(Position.joint0, Position.joint1, Position.joint2);
-      Serial.print("Current endpoint position: ");
-      Serial.print("X: ");
-      Serial.print(Kinematics.ForwardKinematics_.X);
-      Serial.print("  Y: ");
-      Serial.print(Kinematics.ForwardKinematics_.Y);
-      Serial.print("  Z: ");
-      Serial.print(Kinematics.ForwardKinematics_.Z);
-      INSTRUCTION_BUFFER[0] = 0x01;
-      break;
-    }
-
-  }
-}
-
 int shell_reader(char * data){
   // Wrapper for Serial.read() method
   if (Serial.available()) {
@@ -208,25 +72,42 @@ int Reboot(int argc, char** argv){
 }
 
 int Angle(int argc, char** argv){
-  shell_print("Current joint angle: ");
-  shell_print(Position.joint0); shell_print(", ");
-  shell_print(Position.joint1); shell_print(", ");
-  shell_print(Position.joint2); shell_print(", ");
-  shell_print(Position.joint3); shell_print(", ");
-  shell_print(Position.joint4); shell_print(", ");
-  shell_print(Position.gripper0); shell_print(", ");
-  shell_println(Position.gripper1);
+  shell_printf("Current joint angle: %f, %f, %f, %f, %f, %f, %f \n", Position.joint0, Position.joint1, Position.joint2, Position.joint3, Position.joint4, Position.gripper0, Position.gripper1);
 
   return SHELL_RET_SUCCESS;
 }
 
 int For_kin(int argc, char** argv){
-  ESP.restart();
+  Kinematics.ForwardKinematics(Position.joint0, Position.joint1, Position.joint2, Position.joint3, Position.joint4);
+  shell_printf("Current endpoint position: X %f, Y %f, Z %f \n", Kinematics.ForwardKinematics_.X, Kinematics.ForwardKinematics_.Y, Kinematics.ForwardKinematics_.Z);
+
   return SHELL_RET_SUCCESS;
 }
 
-int Anv_kin(int argc, char** argv){
-  ESP.restart();
+int Inv_kin(int argc, char** argv){
+  if(argc < 4){
+    shell_print_error(E_SHELL_ERR_ARGCOUNT,0);
+    shell_println("");
+    return SHELL_RET_FAILURE;
+  }
+
+  float X = strtof(argv[0], 0);
+  float Y = strtof(argv[1], 0);
+  float Z = strtof(argv[2], 0);
+  float endeffectorAngle = strtof(argv[3], 0);
+  ESP_LOGI("Shell", "Position: X %f, Y %f, Z %f, Ang %f", X, Y, X, endeffectorAngle);
+
+  // calculate
+  Kinematics.InverseKinematics(X, Y, Z, endeffectorAngle);
+  ESP_LOGI("Shell", "inv_kin: J0 %f, J1 %f, J2 %f, J3 %f, J4 %f", Kinematics.Position_.Joint0, Kinematics.Position_.LeftyJoint1, Kinematics.Position_.LeftyJoint2, Kinematics.Position_.LeftyJoint3, Kinematics.Position_.Joint0);
+
+  SerialServo.moveTo(1, Kinematics.Position_.Joint0);
+  SerialServo.moveTo(2, Kinematics.Position_.LeftyJoint1);
+  SerialServo.moveTo(3, Kinematics.Position_.LeftyJoint2);
+
+  PWMServo0.moveTo(Kinematics.Position_.LeftyJoint3);
+  PWMServo1.moveTo(Kinematics.Position_.Joint0);
+
   return SHELL_RET_SUCCESS;
 }
 
@@ -243,4 +124,32 @@ int Goto(int argc, char** argv){
 int Inv_kin_top(int argc, char** argv){
   ESP.restart();
   return SHELL_RET_SUCCESS;
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  SerialServo.enabletorque(254, true); // for all
+  SerialServo.moveTo(1, 0);
+  SerialServo.moveTo(2, 0);
+  SerialServo.moveTo(3, 0);
+
+  PWMServo0.moveTo(0);
+  PWMServo1.moveTo(0);
+
+  PWMServo2.moveTo(0);
+  PWMServo3.moveTo(0);
+
+  // shell init
+  shell_init(shell_reader, shell_writer, "5-DOF ARM, type 'help' for more info.");
+  shell_register(ESTOP, "ESTOP");
+  shell_register(help, "help");
+  shell_register(Reboot, "Reboot");
+  shell_register(Angle, "Angle");
+  shell_register(For_kin, "For_kin");
+}
+
+void loop(){
+  // shell task
+  shell_task();
 }

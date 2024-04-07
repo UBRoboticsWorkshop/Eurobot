@@ -29,7 +29,7 @@
 
 #ifdef ARDUINO
 #include <Arduino.h>
-#ifdef ESP8266
+#if defined(ESP32) || defined(ESP32C3) || defined(ESP32S2) || defined(ESP32S3)
 #include <pgmspace.h>
 #else
 #include <avr/pgmspace.h>
