@@ -6,12 +6,12 @@
 // Joint 0, 1, 2
 serialservo SerialServo(Serial2);
 // Joint 3
-pwmservo PWMServo0(15,0);
+pwmservo PWMServo0(25, 0);
 // Joint 4
-pwmservo PWMServo1(16,1);
+pwmservo PWMServo1(26, 1);
 // Gripper 
-pwmservo PWMServo2(17,2);
-pwmservo PWMServo3(18,3);
+pwmservo PWMServo2(27, 2, 0);
+pwmservo PWMServo3(13, 3, 0);
 
 // 5 DOF kinematics
 kinematics Kinematics(20, 20, 20, 20, 20, 20);
@@ -19,10 +19,14 @@ kinematics Kinematics(20, 20, 20, 20, 20, 20);
 
 
 void setup(){
-  SerialServo.enabletorque(1);
+  SerialServo.enabletorque(254); // for all
 
-  SerialServo.moveTo(1, 90);
-  PWMServo1.servoSetAngle(90);
+  SerialServo.moveTo(1, 0);
+  SerialServo.moveTo(2, 0);
+  SerialServo.moveTo(3, 0);
+
+  PWMServo0.moveTo(0);
+  PWMServo1.moveTo(0);
 }
 
 void loop(){

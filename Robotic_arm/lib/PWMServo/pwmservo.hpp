@@ -4,7 +4,7 @@
 
 class pwmservo {
 public:
-    pwmservo(uint8_t pinIN, uint8_t ledCH, uint16_t lowerPWM = 10, uint16_t upperPWM = 65535, uint16_t lowerAngle = 0, uint16_t upperAngle = 180, float offset = 90) {
+    pwmservo(uint8_t pinIN, uint8_t ledCH, float offset = 90, uint16_t lowerPWM = 10, uint16_t upperPWM = 65535, uint16_t lowerAngle = 0, uint16_t upperAngle = 180) {
         _pinIN = pinIN; 
         _ledCH = ledCH;         // 0 - 15 are availible by default
 
@@ -21,7 +21,7 @@ public:
         ledcAttachPin(_pinIN, _ledCH);
     };
 
-    void servoSetAngle(float angle);
+    void moveTo(float angle);
     void servoGoto(uint16_t angle);
     void servoStop();
 

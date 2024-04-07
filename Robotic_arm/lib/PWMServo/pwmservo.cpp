@@ -12,7 +12,7 @@ void pwmservo::servoGoto(uint16_t angle){ // processed angle lower - upper
   ledcWrite(_ledCH, pwm);
 }
 
-void pwmservo::servoSetAngle(float angle){
+void pwmservo::moveTo(float angle){
   angle += _offset;
   if (angle < 0.0f) {
     angle += 360.0f;
