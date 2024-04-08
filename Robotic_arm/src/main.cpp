@@ -115,12 +115,35 @@ int Inv_kin(int argc, char** argv){
 }
 
 int Add(int argc, char** argv){
-  ESP.restart();
+  //ESP.restart();
+  if(argc==6){
+    Position.joint0 += strtof(argv[1], 0);
+    Position.joint1 += strtof(argv[2], 0);
+    Position.joint2 += strtof(argv[3], 0);
+    Position.joint3 += strtof(argv[4], 0);
+    Position.joint4 += strtof(argv[5], 0);
+  } else {
+    shell_print_error(E_SHELL_ERR_ARGCOUNT,0);
+    shell_println("");
+    return SHELL_RET_FAILURE;
+  }
   return SHELL_RET_SUCCESS;
 }
 
 int Goto(int argc, char** argv){
-  ESP.restart();
+  if(argc==6){
+    Position.joint0 = strtof(argv[1], 0);
+    Position.joint1 = strtof(argv[2], 0);
+    Position.joint2 = strtof(argv[3], 0);
+    Position.joint3 = strtof(argv[4], 0);
+    Position.joint4 = strtof(argv[5], 0);
+    //Position.gripper0 = 0;
+  } else {
+    shell_print_error(E_SHELL_ERR_ARGCOUNT,0);
+    shell_println("");
+    return SHELL_RET_FAILURE;
+  }
+  //ESP.restart();
   return SHELL_RET_SUCCESS;
 }
 
