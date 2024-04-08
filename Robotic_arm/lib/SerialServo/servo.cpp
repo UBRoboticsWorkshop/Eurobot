@@ -67,6 +67,7 @@ void serialservo::SetID(uint8_t originID, uint8_t targetID){
  * @param position in deg  
  */
 void serialservo::moveTo(uint8_t ID, float angle){
+  angle += _offset;
   while (angle < 0.0f) angle += 360;
   if (angle > 360.0f) angle = uint16_t(angle) % 360;
   ESP_LOGV("moveTo", "angle: %d", uint16_t(angle));
@@ -116,7 +117,8 @@ void serialservo::writeTest(uint8_t ID, uint8_t reg, uint8_t *data, uint8_t nLen
 
 void serialservo::write16bit(uint8_t ID, uint8_t reg, uint16_t val){
   uint8_t data[2];
-  data[1] = (uint8_t)((val&0xFF00)>>8);
+  // data[1] = (uint8_t)((val&0xFF00)>>8);
+  data[1] = (uint8_t)(val>>8);
   data[0] = (uint8_t)(val&0x00FF);
   ESP_LOGV("serial_servo", "Write 2-bytes: %X%X", data[0], data[1]);
   writeBuf(ID, reg, data, 2, INST_WRITE);
