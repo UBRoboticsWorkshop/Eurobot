@@ -18,7 +18,7 @@
 	Author e-mail: ruben at geekfactory dot mx
  */
 #include "Shell.h"
-//#define text_output
+//#define text_output //for shell text output
 
 /**
  * This structure array contains the available commands and they associated
