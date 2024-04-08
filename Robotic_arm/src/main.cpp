@@ -131,17 +131,15 @@ int Inv_kin_top(int argc, char** argv){
 
 void setup() {
   SerialServo.enabletorque(254, true); // for all
-  SerialServo.moveTo(1, 0);
-  SerialServo.moveTo(2, 0);
-  SerialServo.moveTo(3, 0);
+  // SerialServo.moveTo(1, 0);
+  // SerialServo.moveTo(2, 0);
+  // SerialServo.moveTo(3, 0);
 
-  PWMServo0.moveTo(0);
-  PWMServo1.moveTo(0);
+  // PWMServo0.moveTo(0);
+  // PWMServo1.moveTo(0);
 
-  PWMServo2.moveTo(0);
-  PWMServo3.moveTo(0);
-
-  delay(100);
+  // PWMServo2.moveTo(0);
+  // PWMServo3.moveTo(0);
 
   // shell init
   Serial.begin(115200);
