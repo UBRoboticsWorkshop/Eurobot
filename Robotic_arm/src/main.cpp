@@ -38,7 +38,7 @@ void shell_writer(char data){
 
 void moveJoint(float angle0,float angle1,float angle2,float angle3, float angle4){
   SerialServo.moveTo(1, angle0);
-  SerialServo.moveTo(2, angle1, 191);
+  SerialServo.moveTo(2, angle1, 190);
   SerialServo.moveTo(3, angle2, 189);
   PWMServo0.moveTo(angle3);
   PWMServo1.moveTo(angle4);
