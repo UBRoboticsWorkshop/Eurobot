@@ -4,7 +4,7 @@ static const char* TAG = "kinematics";
 
 
 
-void kinematics::InverseKinematics(float targetX, float targetY, float targetZ, float endeffectorAngle, bool rightly) {
+bool kinematics::InverseKinematics(float targetX, float targetY, float targetZ, float endeffectorAngle, bool rightly) {
   //fix end effector direction
   float targetZJ3 = targetZ + sin(180.0f - endeffectorAngle) * (_L2 + _L3);
 
@@ -32,9 +32,10 @@ void kinematics::InverseKinematics(float targetX, float targetY, float targetZ, 
     } else {
       Position_.Joint3 = -180.0f + endeffectorAngle - Position_.Joint1 - Position_.Joint2 + 360.0f;
     }
-
+    return true;
   } else {
     ESP_LOGW(TAG, "OUT OF RANGE!");
+    return false;
   }
 };
 

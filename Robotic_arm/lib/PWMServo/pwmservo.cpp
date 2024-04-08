@@ -16,10 +16,10 @@ void pwmservo::servoGoto(uint16_t angle){ // processed angle lower - upper
 void pwmservo::moveTo(float angle){
   angle += _offset;
   while (angle < 0.0f) angle += 360;
-  if (angle > 360.0f) angle = int(angle) % 360;
+  while (angle > 360.0f) angle -= 360;
 
   if (angle < _lowerAngle || angle > _upperAngle){
-    ESP_LOGW("pwmservo", "OUT OF RANGE!");
+    ESP_LOGW("pwmservo", "Goto: %d deg, OUT OF RANGE!", uint16_t(angle));
   } else {
     servoGoto(angle);
   }

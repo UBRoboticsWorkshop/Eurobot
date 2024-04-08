@@ -22,7 +22,7 @@ class kinematics{
       float X, Y, Z;
     } ForwardKinematics_, transformed_;
 
-    void InverseKinematics(float targetX, float targetY, float targetZ, float endeffectorAngle, bool rightly);
+    bool InverseKinematics(float targetX, float targetY, float targetZ, float endeffectorAngle, bool rightly);
     void ForwardKinematics(float Joint0, float Joint1, float Joint2, float Joint3, float Joint4);
     void CoordinateTrans(float originX, float originY, float originZ, float X, float Y, float Z);
 

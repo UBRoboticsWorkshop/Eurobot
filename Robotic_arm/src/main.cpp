@@ -95,7 +95,7 @@ int Inv_kin(int argc, char** argv){
   bool r = false;
 
   if(argc < 5){
-    shell_print_error(E_SHELL_ERR_ARGCOUNT,0);
+    shell_print_error(E_SHELL_ERR_ARGCOUNT, 0);
     shell_println("");
     return SHELL_RET_FAILURE;
   } else if ((argc == 6) && (!strcmp(argv[5], (const char *) "-r"))){
@@ -106,15 +106,18 @@ int Inv_kin(int argc, char** argv){
   float Y = strtof(argv[2], 0);
   float Z = strtof(argv[3], 0);
   float endeffectorAngle = strtof(argv[4], 0);
-  ESP_LOGD("Shell", "Position: X %f, Y %f, Z %f, Ang %f, rightly %d", X, Y, Z, endeffectorAngle, r);
+  ESP_LOGV("Shell", "Position: X %f, Y %f, Z %f, Ang %f, rightly %d", X, Y, Z, endeffectorAngle, r);
 
   // calculate
-  Kinematics.InverseKinematics(X, Y, Z, endeffectorAngle, r);
-  ESP_LOGI("Shell", "inv_kin: J0 %f, J1 %f, J2 %f, J3 %f, J4 %f", Kinematics.Position_.Joint0, Kinematics.Position_.Joint1, Kinematics.Position_.Joint2, Kinematics.Position_.Joint3, Kinematics.Position_.Joint0);
-  
-  moveJoint(Kinematics.Position_.Joint0, Kinematics.Position_.Joint1, Kinematics.Position_.Joint2, Kinematics.Position_.Joint3, Kinematics.Position_.Joint4);
-  
-  return SHELL_RET_SUCCESS;
+  if (Kinematics.InverseKinematics(X, Y, Z, endeffectorAngle, r)){
+    ESP_LOGI("Shell", "inv_kin: J0 %f, J1 %f, J2 %f, J3 %f, J4 %f", Kinematics.Position_.Joint0, Kinematics.Position_.Joint1, Kinematics.Position_.Joint2, Kinematics.Position_.Joint3, Kinematics.Position_.Joint0);
+    moveJoint(Kinematics.Position_.Joint0, Kinematics.Position_.Joint1, Kinematics.Position_.Joint2, Kinematics.Position_.Joint3, Kinematics.Position_.Joint4);
+    return SHELL_RET_SUCCESS;
+  } else {
+    shell_print_error(E_SHELL_ERR_ACTION, 0);
+    shell_println("");
+    return SHELL_RET_FAILURE;
+  }
 }
 
 int Add(int argc, char** argv){
