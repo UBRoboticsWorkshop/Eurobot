@@ -30,7 +30,14 @@ int shell_reader(char * data){
   }
   return 0;
 }
-
+void moveJoint(float angle0,float angle1,float angle2,float angle3, float angle4){
+  SerialServo.moveTo(1, angle0);
+  SerialServo.moveTo(2, angle1);
+  SerialServo.moveTo(3, angle2);
+  PWMServo0.moveTo(angle3);
+  PWMServo1.moveTo(angle4);
+  
+}
 void shell_writer(char data){
   // Wrapper for Serial.write() method
   Serial.write(data);
@@ -103,14 +110,9 @@ int Inv_kin(int argc, char** argv){
   // calculate
   Kinematics.InverseKinematics(X, Y, Z, endeffectorAngle, r);
   ESP_LOGI("Shell", "inv_kin: J0 %f, J1 %f, J2 %f, J3 %f, J4 %f", Kinematics.Position_.Joint0, Kinematics.Position_.Joint1, Kinematics.Position_.Joint2, Kinematics.Position_.Joint3, Kinematics.Position_.Joint0);
-
-  SerialServo.moveTo(1, Kinematics.Position_.Joint0);
-  SerialServo.moveTo(2, Kinematics.Position_.Joint1);
-  SerialServo.moveTo(3, Kinematics.Position_.Joint2);
-
-  PWMServo0.moveTo(Kinematics.Position_.Joint3);
-  PWMServo1.moveTo(Kinematics.Position_.Joint0);
-
+  
+  moveJoint(Kinematics.Position_.Joint0, Kinematics.Position_.Joint1, Kinematics.Position_.Joint2, Kinematics.Position_.Joint3, Kinematics.Position_.Joint4);
+  
   return SHELL_RET_SUCCESS;
 }
 
@@ -122,6 +124,7 @@ int Add(int argc, char** argv){
     Position.joint2 += strtof(argv[3], 0);
     Position.joint3 += strtof(argv[4], 0);
     Position.joint4 += strtof(argv[5], 0);
+    moveJoint(Position.joint0, Position.joint1, Position.joint2, Position.joint3, Position.joint4);
   } else {
     shell_print_error(E_SHELL_ERR_ARGCOUNT,0);
     shell_println("");
@@ -137,6 +140,7 @@ int Goto(int argc, char** argv){
     Position.joint2 = strtof(argv[3], 0);
     Position.joint3 = strtof(argv[4], 0);
     Position.joint4 = strtof(argv[5], 0);
+    moveJoint(Position.joint0, Position.joint1, Position.joint2, Position.joint3, Position.joint4);
     //Position.gripper0 = 0;
   } else {
     shell_print_error(E_SHELL_ERR_ARGCOUNT,0);
