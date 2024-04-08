@@ -30,17 +30,18 @@ int shell_reader(char * data){
   }
   return 0;
 }
+
+void shell_writer(char data){
+  // Wrapper for Serial.write() method
+  Serial.write(data);
+}
+
 void moveJoint(float angle0,float angle1,float angle2,float angle3, float angle4){
   SerialServo.moveTo(1, angle0);
   SerialServo.moveTo(2, angle1);
   SerialServo.moveTo(3, angle2);
   PWMServo0.moveTo(angle3);
   PWMServo1.moveTo(angle4);
-  
-}
-void shell_writer(char data){
-  // Wrapper for Serial.write() method
-  Serial.write(data);
 }
 
 int help(int argc, char** argv){
@@ -117,7 +118,6 @@ int Inv_kin(int argc, char** argv){
 }
 
 int Add(int argc, char** argv){
-  //ESP.restart();
   if(argc==6){
     Position.joint0 += strtof(argv[1], 0);
     Position.joint1 += strtof(argv[2], 0);
@@ -147,7 +147,6 @@ int Goto(int argc, char** argv){
     shell_println("");
     return SHELL_RET_FAILURE;
   }
-  //ESP.restart();
   return SHELL_RET_SUCCESS;
 }
 
