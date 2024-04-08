@@ -18,6 +18,7 @@
 	Author e-mail: ruben at geekfactory dot mx
  */
 #include "Shell.h"
+//#define text_output
 
 /**
  * This structure array contains the available commands and they associated
@@ -314,12 +315,16 @@ void shell_task()
 			break;
 
 		case SHELL_ASCII_HT:
+#ifdef text_output
 			shell_putc(SHELL_ASCII_BEL);
+#endif
 			break;
 
 		case SHELL_ASCII_CR: // Enter key pressed
 			shellbuf[count] = '\0';
+#ifdef text_output
 			shell_println("");
+#endif
 			cc = true;
 			break;
 
@@ -327,17 +332,23 @@ void shell_task()
 		case SHELL_ASCII_BS: // Backspace pressed
 			if (count > 0) {
 				count--;
+#ifdef text_output
 				shell_putc(SHELL_ASCII_BS);
 				shell_putc(SHELL_ASCII_SP);
 				shell_putc(SHELL_ASCII_BS);
+#endif
 			} else
+#ifdef text_output
 				shell_putc(SHELL_ASCII_BEL);
+#endif
 			break;
 		default:
 			// Process printable characters, but ignore other ASCII chars
 			if (count < (CONFIG_SHELL_MAX_INPUT - 1) && rxchar >= 0x20 && rxchar < 0x7F) {
 				shellbuf[count] = rxchar;
+#ifdef text_output
 				shell_putc(rxchar);
+#endif
 				count++;
 			}
 		}
@@ -372,8 +383,10 @@ void shell_task()
 			}
 			count = 0;
 			cc = false;
+#ifdef text_output
 			shell_println("");
 			shell_prompt();
+#endif
 		}
 	}
 }
