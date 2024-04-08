@@ -17,7 +17,7 @@ class kinematics{
     };
 
     struct Position {
-      float Joint0, Joint1, Joint2, Joint3;
+      float Joint0, Joint1, Joint2, Joint3, Joint4;
     } Position_;
 
     struct ForwardKinematicsOutput {
