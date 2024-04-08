@@ -6,9 +6,9 @@ static const char* TAG = "kinematics";
 
 void kinematics::InverseKinematics(float targetX, float targetY, float targetZ, float endeffectorAngle, bool rightly) {
   //fix end effector direction
-  float targetZJ3 = targetZ + sin(180.0f - endeffectorAngle) * (_L3 + _L4);
+  float targetZJ3 = targetZ + sin(180.0f - endeffectorAngle) * (_L2 + _L3);
 
-  float x_y = sqrt(targetX * targetX + targetY * targetY) - cos(180.0f - endeffectorAngle) * (_L3 + _L4);
+  float x_y = sqrt(targetX * targetX + targetY * targetY) - cos(180.0f - endeffectorAngle) * (_L2 + _L3);
   float xy_z = sqrt(x_y * x_y + targetZJ3 * targetZJ3);
   ESP_LOGD("InverseKinematics", "x_y %f, xy_z %f, _Lsum %f, _Ldiff %f", x_y, xy_z, _Lsum, _Ldiff);
 
@@ -39,8 +39,8 @@ void kinematics::InverseKinematics(float targetX, float targetY, float targetZ, 
 };
 
 void kinematics::ForwardKinematics(float Joint0, float Joint1, float Joint2, float Joint3, float Joint4) {
-  ForwardKinematics_.Z = _L1 * sin(Joint1) + _L2 * sin(Joint1 + Joint2);
-  float _xy = _L1 * cos(Joint1) + _L2 * cos(Joint1 + Joint2);
+  ForwardKinematics_.Z = _L0 * sin(Joint1) + _L1 * sin(Joint1 + Joint2);
+  float _xy = _L0 * cos(Joint1) + _L1 * cos(Joint1 + Joint2);
   ForwardKinematics_.X = _xy * cos(Joint0);
   ForwardKinematics_.Y = _xy * sin(Joint0);
 };

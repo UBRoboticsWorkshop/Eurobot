@@ -16,7 +16,7 @@ pwmservo PWMServo1(26, 1);
 pwmservo PWMServo2(27, 2, 0);
 pwmservo PWMServo3(13, 3, 0);
 // 5 DOF kinematics
-kinematics Kinematics(20, 20, 20, 20, 20, 20);
+kinematics Kinematics(10, 10, 4.5, 0);
 
 struct position {
   float joint0, joint1, joint2, joint3, joint4, gripper0, gripper1;
