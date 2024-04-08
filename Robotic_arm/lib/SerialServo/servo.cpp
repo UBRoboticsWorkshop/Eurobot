@@ -68,9 +68,10 @@ void serialservo::SetID(uint8_t originID, uint8_t targetID){
  */
 void serialservo::moveTo(uint8_t ID, float angle){
   while (angle < 0.0f) angle += 360;
-  if (angle > 360.0f) angle = int(angle) % 360;
-  uint16_t position = map(angle, 0, 360, 0, 4095);
-  ESP_LOGI("serial_servo", "Servo %d goto: %d deg, %d/4096", ID, angle, position);
+  if (angle > 360.0f) angle = uint16_t(angle) % 360;
+  ESP_LOGV("moveTo", "angle: %d", uint16_t(angle));
+  uint16_t position = angle * 11;
+  ESP_LOGI("serial_servo", "Servo %d goto: %d deg, %d/4096", ID-1, uint16_t(angle), position);
   write16bit(ID, SMS_STS_GOAL_POSITION_L, position);
 }
 
@@ -117,7 +118,7 @@ void serialservo::write16bit(uint8_t ID, uint8_t reg, uint16_t val){
   uint8_t data[2];
   data[1] = (uint8_t)((val&0xFF00)>>8);
   data[0] = (uint8_t)(val&0x00FF);
-  ESP_LOGD("serial_servo", "Write 2-bytes: %X%X", data[0], data[1]);
+  ESP_LOGV("serial_servo", "Write 2-bytes: %X%X", data[0], data[1]);
   writeBuf(ID, reg, data, 2, INST_WRITE);
 }
 
@@ -130,7 +131,7 @@ void serialservo::readTest(uint8_t ID, uint8_t reg, uint8_t *data, uint8_t nLen)
   uint8_t byteRead, i;
   while (_serial.available() > 0) {
     byteRead = _serial.read();
-    ESP_LOGI("serial_servo", "%d Read data: %d", i, byteRead);
+    ESP_LOGV("serial_servo", "%d Read data: %d", i, byteRead);
     if (i == 5) data[0] = byteRead;
     if (i == 6) data[1] = byteRead;
     i++;

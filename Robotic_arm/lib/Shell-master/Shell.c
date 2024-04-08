@@ -502,7 +502,7 @@ static void shell_process_escape(int argc, char ** argv)
 static void shell_prompt()
 {
 #ifdef ARDUINO
-	shell_print_pm(PSTR("device>"));
+	shell_print_pm(PSTR("5-DOF-ARM>"));
 #else
 	shell_print((const char *) "device>");
 #endif

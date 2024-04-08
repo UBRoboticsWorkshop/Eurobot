@@ -11,6 +11,9 @@ class kinematics{
       _L3 = L3;
       _L4 = L4;
       _L5 = L5;
+
+      _Lsum = _L0 + _L1;
+      _Ldiff = abs(_L0 - _L1);
     };
 
     struct Position {
@@ -27,8 +30,8 @@ class kinematics{
 
   private:
     float _L0, _L1, _L2, _L3, _L4, _L5;
-    float _Lsum = _L0 + _L1;
-    float _Ldiff = abs(_L0 - _L1);
+    float _Lsum;
+    float _Ldiff;
     float _Alpha, _Beta, _Gamma;
     //float _Theta;
 };

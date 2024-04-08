@@ -38,14 +38,14 @@ void shell_writer(char data){
 
 int help(int argc, char** argv){
   shell_println("================================help===============================");
-  shell_println("== 0. Set Joints' Angle: Goto <J0> <J1> <J2> <J3> <J4> <J5>      ==");
-  shell_println("== 1. Turn Certain Angle: Add <J0> <J1> <J2> <J3> <J4> <J5>      ==");
-  shell_println("== 2. Inverse Kinematics (base): Inv_kin <x> <y> <z> -r(rightly) ==");
-  shell_println("== 3. Inverse Kinematics (top): Inv_kin_top <x> <y> <z> -r       ==");
-  shell_println("== 4. Forward Kinematics: For_kin                                ==");
-  shell_println("== 5. Current Joint Angle: Angle                                 ==");
-  shell_println("== 6. EStop: ESTOP                                               ==");
-  shell_println("== 7. Reboot: Reboot                                             ==");
+  shell_println("== 0. Set Joints' Angle: goto <J0> <J1> <J2> <J3> <J4> <J5>      ==");
+  shell_println("== 1. Turn Certain Angle: add <J0> <J1> <J2> <J3> <J4> <J5>      ==");
+  shell_println("== 2. Inverse Kinematics (base): inv_kin <x> <y> <z> -r(rightly) ==");
+  shell_println("== 3. Inverse Kinematics (top): inv_kin_top <x> <y> <z> -r       ==");
+  shell_println("== 4. Forward Kinematics: for_kin                                ==");
+  shell_println("== 5. Current Joint Angle: angle                                 ==");
+  shell_println("== 6. EStop: estop                                               ==");
+  shell_println("== 7. Reboot: reboot                                             ==");
   shell_println("===================================================================");
 
   return SHELL_RET_SUCCESS;
@@ -86,19 +86,19 @@ int For_kin(int argc, char** argv){
 int Inv_kin(int argc, char** argv){
   bool r = false;
 
-  if(argc < 4){
+  if(argc < 5){
     shell_print_error(E_SHELL_ERR_ARGCOUNT,0);
     shell_println("");
     return SHELL_RET_FAILURE;
-  } else if ((argc == 5) && (!strcmp(argv[4], (const char *) "-r"))){
+  } else if ((argc == 6) && (!strcmp(argv[5], (const char *) "-r"))){
     r = true;
   }
 
-  float X = strtof(argv[0], 0);
-  float Y = strtof(argv[1], 0);
-  float Z = strtof(argv[2], 0);
-  float endeffectorAngle = strtof(argv[3], 0);
-  ESP_LOGI("Shell", "Position: X %f, Y %f, Z %f, Ang %f", X, Y, X, endeffectorAngle);
+  float X = strtof(argv[1], 0);
+  float Y = strtof(argv[2], 0);
+  float Z = strtof(argv[3], 0);
+  float endeffectorAngle = strtof(argv[4], 0);
+  ESP_LOGD("Shell", "Position: X %f, Y %f, Z %f, Ang %f, rightly %d", X, Y, Z, endeffectorAngle, r);
 
   // calculate
   Kinematics.InverseKinematics(X, Y, Z, endeffectorAngle, r);
@@ -130,8 +130,6 @@ int Inv_kin_top(int argc, char** argv){
 }
 
 void setup() {
-  Serial.begin(115200);
-
   SerialServo.enabletorque(254, true); // for all
   SerialServo.moveTo(1, 0);
   SerialServo.moveTo(2, 0);
@@ -143,13 +141,20 @@ void setup() {
   PWMServo2.moveTo(0);
   PWMServo3.moveTo(0);
 
+  delay(100);
+
   // shell init
-  shell_init(shell_reader, shell_writer, "5-DOF ARM, type 'help' for more info.");
-  shell_register(ESTOP, "ESTOP");
+  Serial.begin(115200);
+  shell_init(shell_reader, shell_writer, "5-DOF ARM, type 'help/r/n' for more info.");
+  shell_register(ESTOP, "estop");
   shell_register(help, "help");
-  shell_register(Reboot, "Reboot");
-  shell_register(Angle, "Angle");
-  shell_register(For_kin, "For_kin");
+  shell_register(Reboot, "reboot");
+  shell_register(Angle, "angle");
+  shell_register(For_kin, "for_kin");
+  shell_register(Inv_kin, "inv_kin");
+  shell_register(Add, "add");
+  shell_register(Goto, "goto"); 
+  shell_register(Inv_kin_top, "inv_kin_top");
 }
 
 void loop(){
