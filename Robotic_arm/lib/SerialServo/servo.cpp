@@ -66,8 +66,9 @@ void serialservo::SetID(uint8_t originID, uint8_t targetID){
 /*
  * @param position in deg  
  */
-void serialservo::moveTo(uint8_t ID, float angle){
-  angle += _offset;
+void serialservo::moveTo(uint8_t ID, float angle, float offset){
+  angle = -angle; // reverse
+  angle += offset;
   while (angle < 0.0f) angle += 360;
   if (angle > 360.0f) angle = uint16_t(angle) % 360;
   ESP_LOGV("moveTo", "angle: %d", uint16_t(angle));

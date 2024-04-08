@@ -5,20 +5,16 @@
 
 class serialservo{
 public:
-    serialservo(HardwareSerial &serialport, float offset = 180): _serial(serialport){ //Serial2
+    serialservo(HardwareSerial &serialport): _serial(serialport){ //Serial2
         _serial.begin(1000000);
-
-        _offset = offset;
     };
 
     void enabletorque(uint8_t ID, bool enable);
-    void moveTo(uint8_t ID, float position);
+    void moveTo(uint8_t ID, float position, float offset = 180);
     void SetID(uint8_t originID, uint8_t targetID);
 
 private:
     HardwareSerial &_serial;
-
-    float _offset;
 
     void writeBuf(uint8_t ID, uint8_t MemAddr, uint8_t *nDat, uint8_t nLen, uint8_t Fun);
     void writeTest(uint8_t ID, uint8_t reg, uint8_t *data, uint8_t nLen);

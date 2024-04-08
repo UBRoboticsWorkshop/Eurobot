@@ -9,7 +9,7 @@
 // Joint 0, 1, 2
 serialservo SerialServo(Serial2);
 // Joint 3
-pwmservo PWMServo0(25, 0);
+pwmservo PWMServo0(25, 0, 90.0, 1400, 8000);
 // Joint 4
 pwmservo PWMServo1(26, 1);
 // Gripper 
