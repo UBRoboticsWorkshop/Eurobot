@@ -71,9 +71,9 @@ void serialservo::moveTo(uint8_t ID, float angle, float offset){
   angle += offset;
   while (angle < 0.0f) angle += 360;
   while (angle > 360.0f) angle -= 360;
-  ESP_LOGV("moveTo", "angle: %d", uint16_t(angle));
-  uint16_t position = angle * 11;
-  ESP_LOGI("serial_servo", "Servo %d goto: %d deg, %d/4096", ID-1, uint16_t(angle), position);
+  log_v("angle: %d", uint16_t(angle));
+  uint16_t position = angle * 11.0f;
+  log_i("Servo %d goto: %f deg, %d/4096", ID-1, angle, position);
   write16bit(ID, SMS_STS_GOAL_POSITION_L, position);
 }
 
