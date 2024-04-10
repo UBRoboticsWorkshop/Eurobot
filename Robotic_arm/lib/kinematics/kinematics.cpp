@@ -6,15 +6,15 @@ static const char* TAG = "kinematics";
 
 bool kinematics::InverseKinematics(float targetX, float targetY, float targetZ, float endeffectorAngle, bool rightly) {
   //fix end effector direction
-  float targetZJ3 = targetZ + sin(180.0f - endeffectorAngle) * (_L2 + _L3);
+  float targetZJ3 = targetZ + sin(180.0f - endeffectorAngle) * _L2;
 
-  float x_y = sqrt(targetX * targetX + targetY * targetY) - cos(180.0f - endeffectorAngle) * (_L2 + _L3);
+  float x_y = sqrt(targetX * targetX + targetY * targetY) - cos((180.0f - endeffectorAngle) *PI/180.0f) * _L2;
   float xy_z = sqrt(x_y * x_y + targetZJ3 * targetZJ3);
   ESP_LOGD("InverseKinematics", "x_y %f, xy_z %f, _Lsum %f, _Ldiff %f", x_y, xy_z, _Lsum, _Ldiff);
 
   if (xy_z <= _Lsum && xy_z >= _Ldiff) {
-    _Alpha = acos((xy_z*xy_z + _L0*_L0 - _L1*_L1) / (2 * _L0 * xy_z)) * 180.0f / PI;
-    _Beta = acos((_L0*_L0 + _L1*_L1 - xy_z*xy_z) / (2 * _L0 * _L1)) * 180.0f / PI;
+    _Alpha = acos((xy_z*xy_z + _L0*_L0 - _L1*_L1) / (2 * _L0 * xy_z)) *180.0f/PI;
+    _Beta = acos((_L0*_L0 + _L1*_L1 - xy_z*xy_z) / (2 * _L0 * _L1)) *180.0f/PI;
     _Gamma = atan2(targetZJ3, x_y) * 180.0f / PI;
 
     Position_.Joint0 = atan2(targetY, targetX) * 180.0f / PI;
@@ -40,10 +40,10 @@ bool kinematics::InverseKinematics(float targetX, float targetY, float targetZ, 
 };
 
 void kinematics::ForwardKinematics() {
-  ForwardKinematics_.Z = _L0 * sin(Position_.Joint1) + _L1 * sin(Position_.Joint1 + Position_.Joint2);
-  float _xy = _L0 * cos(Position_.Joint1) + _L1 * cos(Position_.Joint1 + Position_.Joint2);
-  ForwardKinematics_.X = _xy * cos(Position_.Joint0);
-  ForwardKinematics_.Y = _xy * sin(Position_.Joint0);
+  ForwardKinematics_.Z = _L0 * sin(Position_.Joint1 *PI/180.0f) + _L1 * sin((Position_.Joint1 + Position_.Joint2) *PI/180.0f) + _L2 * sin((Position_.Joint1 + Position_.Joint2 + Position_.Joint3) *PI/180.0f);
+  float _xy = _L0 * cos(Position_.Joint1 *PI/180.0f) + _L1 * cos((Position_.Joint1 + Position_.Joint2) *PI/180.0f) + _L2 * cos((Position_.Joint1 + Position_.Joint2 + Position_.Joint3) *PI/180.0f);
+  ForwardKinematics_.X = _xy * cos(Position_.Joint0 *PI/180.0f);
+  ForwardKinematics_.Y = _xy * sin(Position_.Joint0 *PI/180.0f);
 };
 
 void kinematics::CoordinateTrans(float originX, float originY, float originZ, float X, float Y, float Z) {

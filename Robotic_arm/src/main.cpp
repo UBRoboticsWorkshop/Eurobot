@@ -9,14 +9,14 @@
 // Joint 0, 1, 2
 serialservo SerialServo(Serial2);
 // Joint 3
-pwmservo PWMServo0(25, 0, 105.5, 900, 8500, 0, 210);
+pwmservo PWMServo0(25, 0, 135, 900, 8500, 0, 210);
 // Joint 4
 pwmservo PWMServo1(26, 1);
 // Gripper 
 pwmservo PWMServo2(27, 2, 0);
 pwmservo PWMServo3(13, 3, 0);
 // 5 DOF kinematics
-kinematics Kinematics(100, 100, 45, 0); //mm
+kinematics Kinematics(100, 100, 45); //mm
 
 struct position {
   float gripper0, gripper1;
@@ -77,14 +77,14 @@ int Reboot(int argc, char** argv){
 }
 
 int Angle(int argc, char** argv){
-  shell_printf("Current joint angle: %f, %f, %f, %f, %f, %f, %f \n", Kinematics.Position_.Joint0, Kinematics.Position_.Joint1, Kinematics.Position_.Joint2, Kinematics.Position_.Joint3, Kinematics.Position_.Joint4, Position.gripper0, Position.gripper1);
+  Serial.printf("Current joint angle: %f, %f, %f, %f, %f, %f, %f \n", Kinematics.Position_.Joint0, Kinematics.Position_.Joint1, Kinematics.Position_.Joint2, Kinematics.Position_.Joint3, Kinematics.Position_.Joint4, Position.gripper0, Position.gripper1);
 
   return SHELL_RET_SUCCESS;
 }
 
 int For_kin(int argc, char** argv){
   Kinematics.ForwardKinematics();
-  shell_printf("Current endpoint position: X %f, Y %f, Z %f \n", Kinematics.ForwardKinematics_.X, Kinematics.ForwardKinematics_.Y, Kinematics.ForwardKinematics_.Z);
+  Serial.printf("Current endpoint position: X %f, Y %f, Z %f \n", Kinematics.ForwardKinematics_.X, Kinematics.ForwardKinematics_.Y, Kinematics.ForwardKinematics_.Z);
 
   return SHELL_RET_SUCCESS;
 }
@@ -96,9 +96,11 @@ int Inv_kin(int argc, char** argv){
     shell_print_error(E_SHELL_ERR_ARGCOUNT, 0);
     shell_println("");
     return SHELL_RET_FAILURE;
-  } else if ((argc == 6) && (!strcmp(argv[5], (const char *) "-r"))){
+  } else if ((argc >= 6) && (!strcmp(argv[5], (const char *) "-r"))){
     r = true;
   }
+  // Kinematics.ForwardKinematics();
+  // Kinematics.CoordinateTrans(-Kinematics.ForwardKinematics_.X, -Kinematics.ForwardKinematics_.Y, -Kinematics.ForwardKinematics_.Z, Target.X, Target.Y, Target.Z);
 
   float X = strtof(argv[1], 0);
   float Y = strtof(argv[2], 0);

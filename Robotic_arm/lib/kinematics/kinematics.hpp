@@ -4,11 +4,10 @@
 
 class kinematics{
   public:
-    kinematics(float L0, float L1, float L2, float L3){
+    kinematics(float L0, float L1, float L2){
       _L0 = L0;
       _L1 = L1;
       _L2 = L2;
-      _L3 = L3;
 
       _Lsum = _L0 + _L1;
       _Ldiff = abs(_L0 - _L1);
@@ -27,7 +26,7 @@ class kinematics{
     void CoordinateTrans(float originX, float originY, float originZ, float X, float Y, float Z);
 
   private:
-    float _L0, _L1, _L2, _L3;
+    float _L0, _L1, _L2;
     float _Lsum;
     float _Ldiff;
     float _Alpha, _Beta, _Gamma;
